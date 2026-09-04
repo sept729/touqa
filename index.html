@@ -50,13 +50,13 @@ body::after{
 /* ============================================================
    خلفية القلوب
    ============================================================ */
-.sky{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
-.mote{position:absolute;bottom:-60px;width:12px;height:12px;transform:rotate(-45deg);animation:drift linear infinite}
+.sky{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;transform:translateZ(0);contain:strict}
+.mote{position:absolute;bottom:-60px;width:12px;height:12px;transform:rotate(-45deg);animation:drift linear infinite;contain:layout style paint}
 .mote i{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--m-color, rgba(255,93,143,.42));display:block}
 .mote i::before,.mote i::after{content:'';position:absolute;width:100%;height:100%;background:inherit;border-radius:50%}
 .mote i::before{top:-50%;left:0}
 .mote i::after{top:0;left:50%}
-.mote.spark{width:5px;height:5px;transform:none;filter:blur(.6px)}
+.mote.spark{width:5px;height:5px;transform:none;opacity:.75}
 .mote.spark i{border-radius:50%}
 .mote.spark i::before,.mote.spark i::after{display:none}
 
@@ -74,7 +74,7 @@ body::after{
 
 .envelope{
   position:relative;width:min(340px,86vw);aspect-ratio:34/22;
-  perspective:1000px;
+  perspective:1000px;will-change:transform;
   animation:hover 6s ease-in-out infinite;
   transition:opacity .6s var(--ease), transform .6s var(--ease);
 }
@@ -145,6 +145,7 @@ body::after{
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
   background-size:100% 100%, 100% var(--line), 160px 160px;
   box-shadow:0 30px 80px rgba(0,0,0,.85), inset 0 0 0 1px rgba(122,17,48,.08);
+  contain:layout paint;
   opacity:0;scale:.94;pointer-events:none;
   transition:opacity .7s var(--ease), scale .7s var(--ease);
   z-index:100;
@@ -153,8 +154,12 @@ body::after{
 .letter.leaving{opacity:0;scale:.94;pointer-events:none}
 .letter-inner{padding:var(--line) 22px calc(var(--line) * 1.5) 60px}
 
-.heart-wrap{width:62px;height:calc(var(--line) * 2);margin:0 auto;filter:drop-shadow(0 0 14px rgba(255,42,95,.45))}
-.heart-wrap svg{width:100%;height:100%;display:block}
+.heart-wrap{position:relative;width:62px;height:calc(var(--line) * 2);margin:0 auto}
+.heart-wrap::before{
+  content:'';position:absolute;inset:-16px;pointer-events:none;
+  background:radial-gradient(circle, rgba(255,42,95,.42) 0%, rgba(255,42,95,.18) 45%, transparent 70%);
+}
+.heart-wrap svg{position:relative;width:100%;height:100%;display:block}
 .heart-path{
   fill:rgba(255,26,83,0);stroke:#c8102e;stroke-width:3.5;
   stroke-linecap:round;stroke-linejoin:round;
@@ -173,13 +178,16 @@ body::after{
   font-size:clamp(1.7rem,6.4vw,2.05rem);font-weight:600;font-style:italic;
   color:var(--heading);line-height:var(--line);text-align:center;min-height:var(--line);
 }
-.message{
+.message,.ghost-text{
   font-family:'Caveat',cursive;font-size:1.42rem;font-weight:600;
-  color:var(--ink);line-height:var(--line);white-space:pre-wrap;display:block;
+  line-height:var(--line);white-space:pre-wrap;display:inline;
 }
+.message{color:var(--ink)}
+.ghost-text{visibility:hidden}
 .caret{
   display:inline-block;width:2px;height:1.1rem;background:var(--heading);
-  margin-left:2px;translate:0 2px;animation:blink .75s steps(1,end) infinite;
+  margin-left:2px;margin-right:-4px;translate:0 2px;
+  animation:blink .75s steps(1,end) infinite;
 }
 .caret.off{display:none}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
@@ -214,9 +222,10 @@ body::after{
   width:min(400px,92vw);max-height:90dvh;overflow-y:auto;
   padding:24px 22px 22px;border-radius:22px;
   background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border:1px solid rgba(232,192,125,.28);
   box-shadow:0 34px 70px rgba(0,0,0,.8);
+  contain:layout paint;
   text-align:center;opacity:0;pointer-events:none;
   transition:opacity .7s var(--ease), translate .7s var(--ease), scale .7s var(--ease);
   z-index:200;
@@ -238,6 +247,7 @@ body::after{
   transition:rotate .5s var(--ease);
 }
 .polaroid.tilt{rotate:1.8deg}
+.polaroid{contain:layout paint}
 
 .tape{
   position:absolute;top:-13px;left:50%;translate:-50% 0;
@@ -245,7 +255,6 @@ body::after{
   background:linear-gradient(180deg, rgba(255,201,214,.5), rgba(255,201,214,.28));
   border-left:1px dashed rgba(255,255,255,.4);
   border-right:1px dashed rgba(255,255,255,.4);
-  backdrop-filter:blur(2px);
 }
 
 .slot{
@@ -310,7 +319,7 @@ body::after{
     repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,.05) 0 1px, transparent 1px 5px);
   box-shadow:0 12px 30px rgba(0,0,0,.6);transition:right .7s var(--ease);
 }
-.playing .vinyl{right:-30%;animation:spin 4.5s linear infinite}
+.playing .vinyl{right:-30%;animation:spin 4.5s linear infinite;will-change:transform}
 @keyframes spin{to{rotate:360deg}}
 
 .cover-frame{
@@ -346,10 +355,17 @@ body::after{
 .track{flex:1;text-align:left}
 .bar{position:relative;height:16px;display:flex;align-items:center;cursor:pointer}
 .bar::before{content:'';position:absolute;left:0;right:0;height:4px;border-radius:2px;background:rgba(255,255,255,.18)}
-.fill{position:relative;height:4px;border-radius:2px;width:0%;background:linear-gradient(90deg,var(--blush),var(--rose));transition:width .12s linear}
-.fill::after{
-  content:'';position:absolute;right:-5px;top:50%;translate:0 -50%;
-  width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 8px rgba(255,93,143,.9);
+.fill{
+  position:absolute;left:0;width:100%;height:4px;border-radius:2px;
+  background:linear-gradient(90deg,var(--blush),var(--rose));
+  transform:scaleX(0);transform-origin:left center;
+  transition:transform .12s linear;will-change:transform;
+}
+.knob{
+  position:absolute;left:0;top:50%;width:10px;height:10px;
+  margin:-5px 0 0 -5px;border-radius:50%;background:#fff;
+  box-shadow:0 0 8px rgba(255,93,143,.9);
+  transform:translateX(0);transition:transform .12s linear;will-change:transform;
 }
 .bar:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:4px}
 .times{display:flex;justify-content:space-between;font-size:.88rem;color:rgba(255,255,255,.6);font-variant-numeric:tabular-nums;margin-top:2px}
@@ -411,6 +427,13 @@ body::after{
   *{transition-duration:.15s !important}
 }
 
+@media (max-width:640px){
+  .card{
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    background:linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.07));
+  }
+}
+
 @media (max-width:400px){
   .letter-inner{padding-left:52px;padding-right:16px}
   .message{font-size:1.34rem}
@@ -450,7 +473,7 @@ body::after{
     </div>
     <p class="dateline" id="dateline"></p>
     <h1 class="title" id="title"></h1>
-    <p><span class="message" id="message"></span><span class="caret" id="caret"></span></p>
+    <p><span class="message" id="message"></span><span class="caret" id="caret"></span><span class="ghost-text" id="ghostText"></span></p>
     <p class="skip-note" id="skipNote">Tap anywhere to read it all at once</p>
     <p class="counter" id="counter"></p>
     <p class="signature" id="signature"></p>
@@ -465,7 +488,7 @@ body::after{
   <div class="polaroid" id="polaroid">
     <div class="tape" aria-hidden="true"></div>
     <div class="slot" id="slot">
-      <img id="photo" alt="">
+      <img id="photo" alt="" decoding="async">
       <div class="missing" aria-hidden="true">
         <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5-5-5 5-2-2-6 5"/></svg>
         <b id="missingName">photo1.jpg</b>
@@ -515,7 +538,7 @@ body::after{
     </button>
     <div class="track">
       <div class="bar" id="bar" role="slider" tabindex="0" aria-label="Song progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div class="fill" id="fill"></div>
+        <div class="fill" id="fill"></div><span class="knob" id="knob"></span>
       </div>
       <div class="times"><span id="tNow">0:00</span><span id="tEnd">0:00</span></div>
     </div>
@@ -524,7 +547,7 @@ body::after{
   <div class="row">
     <button class="ghost" id="backToPhotos">Back to the photos</button>
   </div>
-  <audio id="audio" preload="metadata"></audio>
+  <audio id="audio" preload="auto"></audio>
 </section>
 
 <script>
@@ -585,7 +608,8 @@ const $ = id => document.getElementById(id);
   const box = $('sky');
   const colors = ['rgba(255,93,143,.42)','rgba(232,192,125,.35)','rgba(255,201,214,.38)'];
   const frag = document.createDocumentFragment();
-  for (let i = 0; i < 22; i++){
+  const count = Math.max(10, Math.min(22, Math.round(innerWidth / 34)));
+  for (let i = 0; i < count; i++){
     const m = document.createElement('div');
     m.className = 'mote' + (i % 3 === 0 ? ' spark' : '');
     m.innerHTML = '<i></i>';
@@ -642,15 +666,28 @@ seal.addEventListener('click', () => {
 });
 
 /* ---------- الكتابة حرف حرف ---------- */
-const titleEl = $('title'), msgEl = $('message'), caret = $('caret');
+const titleEl = $('title'), msgEl = $('message'), ghostEl = $('ghostText'), caret = $('caret');
 const skipNote = $('skipNote'), toPhotos = $('toPhotos');
-let typing = false, typedDone = false, timer = null;
+let typedDone = false, raf = null;
+
+/* جدول توقيت مسبق: كل حرف يعرف هو هيظهر امتى — نفس الإيقاع بالظبط */
+const TITLE_MS = 70, PAUSE_MS = 400;
+const bodyAt = [];
+(function(){
+  let t = CONFIG.title.length * TITLE_MS + PAUSE_MS;
+  for (const ch of CONFIG.message){
+    t += (ch === '.' || ch === ',') ? 190 : 32;
+    bodyAt.push(t);
+  }
+})();
 
 function finishTyping(){
-  typedDone = true; typing = false;
-  clearTimeout(timer);
+  typedDone = true;
+  if (raf) cancelAnimationFrame(raf);
+  raf = null;
   titleEl.textContent = CONFIG.title;
   msgEl.textContent = CONFIG.message;
+  ghostEl.textContent = '';
   caret.classList.add('off');
   skipNote.classList.add('gone');
   letter.classList.add('reveal');
@@ -660,26 +697,38 @@ function finishTyping(){
 function startTyping(){
   if (typedDone) return;
   if (reduced){ finishTyping(); return; }
-  typing = true;
-  let i = 0, j = 0;
-  (function typeTitle(){
-    if (i < CONFIG.title.length){
-      titleEl.textContent += CONFIG.title[i++];
-      timer = setTimeout(typeTitle, 70);
-    } else timer = setTimeout(typeBody, 400);
-  })();
-  function typeBody(){
-    if (j < CONFIG.message.length){
-      const ch = CONFIG.message[j++];
-      msgEl.textContent += ch;
-      timer = setTimeout(typeBody, (ch === '.' || ch === ',') ? 190 : 32);
-    } else finishTyping();
-  }
+
+  /* النص كله موجود من الأول (نصه مخفي) علشان الورقة ماتكبرش وترسم ظلها كل حرف */
+  ghostEl.textContent = CONFIG.message;
+
+  let t0 = 0, ti = 0, bi = 0;
+  raf = requestAnimationFrame(function step(ts){
+    if (!t0) t0 = ts;
+    const el = ts - t0;
+
+    const wantT = Math.min(CONFIG.title.length, Math.floor(el / TITLE_MS));
+    if (wantT > ti){ ti = wantT; titleEl.textContent = CONFIG.title.slice(0, ti); }
+
+    let wantB = bi;
+    while (wantB < bodyAt.length && bodyAt[wantB] <= el) wantB++;
+    if (wantB > bi){
+      bi = wantB;
+      msgEl.textContent = CONFIG.message.slice(0, bi);
+      ghostEl.textContent = CONFIG.message.slice(bi);
+    }
+
+    if (bi >= CONFIG.message.length){ finishTyping(); return; }
+    raf = requestAnimationFrame(step);
+  });
 }
 
 letter.addEventListener('click', e => {
   if (e.target.closest('button')) return;
   if (!typedDone && opened) finishTyping();
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && !typedDone && opened) finishTyping();
 });
 
 /* ---------- التنقل بين الشاشات ---------- */
@@ -697,7 +746,7 @@ function go(from, to, focusEl){
 
 toPhotos.addEventListener('click', () => go(letter, album, $('nextBtn')));
 $('backToLetter').addEventListener('click', () => go(album, letter, toPhotos));
-$('toSong').addEventListener('click', () => go(album, song, $('playBtn')));
+$('toSong').addEventListener('click', () => { go(album, song, $('playBtn')); setTimeout(measureBar, 420); });
 $('backToPhotos').addEventListener('click', () => go(song, album, $('nextBtn')));
 
 /* ---------- ألبوم الصور ---------- */
@@ -783,7 +832,10 @@ cover.addEventListener('error', () => {
 cover.src = CONFIG.coverFile;
 
 /* ---------- مشغل الصوت ---------- */
-const fill = $('fill'), bar = $('bar'), tNow = $('tNow'), tEnd = $('tEnd');
+const fill = $('fill'), knob = $('knob'), bar = $('bar'), tNow = $('tNow'), tEnd = $('tEnd');
+let barW = 0;
+const measureBar = () => { barW = bar.clientWidth; };
+addEventListener('resize', measureBar, {passive:true});
 const note = $('audioNote'), playBtn = $('playBtn');
 audio.src = CONFIG.audioFile;
 
@@ -793,15 +845,17 @@ const fmt = s => (!isFinite(s) || s < 0) ? '0:00'
 audio.addEventListener('loadedmetadata', () => { tEnd.textContent = fmt(audio.duration); });
 audio.addEventListener('error', () => note.classList.add('show'));
 audio.addEventListener('timeupdate', () => {
-  const p = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-  fill.style.width = p + '%';
-  bar.setAttribute('aria-valuenow', Math.round(p));
+  const r = audio.duration ? audio.currentTime / audio.duration : 0;
+  if (!barW) measureBar();
+  fill.style.transform = 'scaleX(' + r + ')';
+  knob.style.transform = 'translateX(' + (r * barW) + 'px)';
+  bar.setAttribute('aria-valuenow', Math.round(r * 100));
   tNow.textContent = fmt(audio.currentTime);
 });
 audio.addEventListener('play',  () => { song.classList.add('playing');    playBtn.setAttribute('aria-label','Pause'); });
 audio.addEventListener('pause', () => { song.classList.remove('playing'); playBtn.setAttribute('aria-label','Play'); });
 audio.loop = true;
-audio.addEventListener('ended', () => { song.classList.remove('playing'); fill.style.width = '0%'; });
+audio.addEventListener('ended', () => { song.classList.remove('playing'); fill.style.transform = 'scaleX(0)'; knob.style.transform = 'translateX(0)'; });
 
 playBtn.addEventListener('click', () => {
   if (audio.paused) audio.play().catch(() => note.classList.add('show'));
